@@ -1,7 +1,7 @@
 # question_gen.py
 import google.generativeai as genai
 
-genai.configure(api_key="AIzaSyAmHi2CiA4Z-K5-phmyKpd0vzgljrLNUkY")
+genai.configure(api_key="Place Your Own Key Here")
 model = genai.GenerativeModel("gemini-2.0-flash")
 def generate_prompt(company, role, job_desc, skills):
     return f"""
