@@ -1,6 +1,6 @@
 import google.generativeai as genai
 
-genai.configure(api_key="AIzaSyAmHi2CiA4Z-K5-phmyKpd0vzgljrLNUkY")
+genai.configure(api_key="PLACE YOUR OWN KEY HERE")
 model = genai.GenerativeModel("gemini-2.0-flash")
 
 def generate_feedback_prompt(question, answer, role, skills):
