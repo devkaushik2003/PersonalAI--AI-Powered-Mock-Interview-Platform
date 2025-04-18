@@ -1,0 +1,133 @@
+# PersonaAI: AI-Powered Mock Interview Platform
+
+## Project Overview
+PersonaAI is an AI-powered mock interview platform that helps users prepare for job interviews by providing realistic interview simulations with AI-generated questions, real-time speech-to-text transcription, and AI feedback. The platform combines a React frontend with a Flask backend, utilizing various AI APIs to create an interactive interview experience.
+
+## Core Components
+
+### 1. Flask Backend (`backend/app.py`)
+The Flask backend serves as the API layer, handling requests from the frontend and interfacing with AI services. It has three main endpoints:
+
+- **Health Check** (`/`): Confirms the API server is running.
+- **Questions Generation** (`/api/questions`): Generates interview questions based on the company, role, job description, and skills using Google's Gemini API.
+- **Feedback Generation** (`/api/feedback`): Analyzes user responses and provides structured feedback using Google's Gemini API.
+- **Transcription** (`/api/transcribe`): Converts audio recordings to text using the AssemblyAI API.
+
+The backend uses the following libraries:
+- `flask`: Web framework to create the API server
+- `flask-cors`: Enables cross-origin requests from the React frontend
+- `google-generativeai`: Connects to Google's Gemini API for AI question/feedback generation
+- `dotenv`: Manages environment variables like API keys
+- `logging`: Provides structured logging for debugging
+
+### 2. Transcription Service (`transcriber.py`)
+The transcription service handles the conversion of audio to text using AssemblyAI's API. The workflow is:
+
+1. Receive an audio file from the frontend
+2. Save it temporarily to disk
+3. Upload the file to AssemblyAI
+4. Request transcription processing
+5. Poll for the completed transcription
+6. Return the transcribed text
+
+The AssemblyAI API requires an API key (which is included in the file) and follows a three-step process: upload, transcribe, and poll for results.
+
+### 3. React Frontend
+The frontend provides the user interface and manages the interview flow using a context-based state management approach:
+
+- **InterviewContext.js**: The central state management component that handles:
+  - Storing interview details (company, role, job description, skills)
+  - Managing question flow and tracking user responses
+  - Communicating with the Flask backend API
+  - Processing audio recordings
+  - Error handling with fallback content
+
+### 4. Streamlit App (`app.py`)
+A parallel implementation using Streamlit that provides a web interface for the interview process. It includes:
+- Home page for collecting interview details
+- Interview session with camera feed
+- Audio recording capabilities
+- Question display and response handling
+- Interview summary with feedback
+
+## Data Flow
+
+### Interview Setup Flow
+1. User enters company, role, job description, and required skills
+2. Frontend sends this data to the `/api/questions` endpoint
+3. Backend generates tailored interview questions using Gemini API
+4. Questions are sent back to the frontend for display
+
+### Interview Question Flow
+1. User is presented with a question
+2. User can record their answer as audio
+3. Frontend sends the audio recording to the `/api/transcribe` endpoint
+4. Backend uses `transcriber.py` to:
+   - Upload the audio to AssemblyAI
+   - Get the transcription back
+5. Transcribed text is returned to the frontend
+6. Frontend sends the question and transcribed answer to the `/api/feedback` endpoint
+7. Backend generates structured feedback using Gemini API
+8. Feedback is displayed to the user
+9. User proceeds to the next question
+
+## Integration Details
+
+### AssemblyAI Integration
+The system uses AssemblyAI for high-quality speech-to-text conversion. The integration:
+1. Saves the audio file temporarily
+2. Uploads it to AssemblyAI's API
+3. Gets back an upload URL
+4. Initiates a transcription request with that URL
+5. Polls the API until the transcription is complete
+6. Returns the transcribed text
+
+The API key is embedded in the `transcriber.py` file for simplicity, though in production it should be stored as an environment variable.
+
+### Google Gemini API Integration
+The system uses Google's Gemini API for two AI-powered features:
+1. **Interview Question Generation**: Creates contextually relevant questions based on the job description and required skills
+2. **Response Feedback**: Analyzes user responses to provide constructive feedback
+
+The API prompts are carefully crafted to produce consistently structured outputs that can be processed by the application.
+
+## Technical Implementation Notes
+
+### Error Handling
+The application includes robust error handling:
+- API connectivity issues are detected and reported
+- Transcription errors are caught and user-friendly messages are displayed
+- Fallback content is provided when AI services are unavailable
+
+### Performance Considerations
+- Audio files are processed on the server to reduce client-side load
+- Polling mechanisms are implemented for the AssemblyAI API to handle asynchronous processing
+- The frontend includes loading states to keep users informed during processing
+
+## Usage Instructions
+1. Start the Flask backend: `py -m backend.app`
+2. The backend will run on http://localhost:5000
+3. The React frontend should connect to this endpoint automatically
+4. Users can access the application through the React frontend
+5. Alternatively, the Streamlit app can be run with `streamlit run app.py`
+
+## Security Notes
+- The application uses API keys that should be properly secured in a production environment
+- CORS is enabled on the backend to allow requests from the frontend
+- Audio data is temporarily stored and then deleted after processing
+
+## Future Enhancement Possibilities
+- Add user authentication
+- Implement session recording for later review
+- Add more specialized interview templates for different roles
+- Incorporate video analysis for non-verbal feedback
+- Add scheduling and reminder features
+
+## Technology Stack
+- **Backend**: Flask (Python)
+- **Frontend**: React
+- **Alternative UI**: Streamlit
+- **AI Services**:
+  - Google Gemini API for question generation and feedback
+  - AssemblyAI for speech-to-text conversion
+- **Data Storage**: Currently in-memory, could be extended to a database 
