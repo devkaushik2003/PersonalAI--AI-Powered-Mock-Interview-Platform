@@ -15,7 +15,7 @@ def transcribe_audio(file):
 
     # Upload to AssemblyAI
     upload_url = "https://api.assemblyai.com/v2/upload"
-    headers = {"authorization": "bec2473de05746d8bcff0bd3c395f546"}
+    headers = {"authorization": "Place Your Own Key Here"}
     
     with open(tmp_path, "rb") as f:
         response = requests.post(upload_url, headers=headers, data=f)
